@@ -28,7 +28,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class UserBankApi {
 	
 	
-
+	@Autowired
+	private UserService userService;
+	
+	@Autowired
+	private BankService bankService;
+	
 	@PostMapping("/createbankuser")
 	public ResponseEntity<DigiSevaResponseEntity> createBankUser(@Valid @RequestBody BankRequest request) throws JsonProcessingException{
 		Optional<Users> user = userService.findById(request.getUser_id());
