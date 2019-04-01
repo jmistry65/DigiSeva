@@ -1,17 +1,21 @@
 package com.edigiseva.serviceImpl;
 
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-import javax.crypto.NoSuchPaddingException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.edigiseva.message.request.ECollectionVO;
 import com.edigiseva.message.request.UserBankRequest;
+import com.edigiseva.model.ECollection;
 import com.edigiseva.model.UserBank;
 import com.edigiseva.repository.UserBankRepository;
 import com.edigiseva.securedata.AsymmetricCryptography;
@@ -23,7 +27,8 @@ public class UserBankServiceImpl implements UserBankService {
 	@Autowired
 	private UserBankRepository userBankRepo;
 
-
+	private static final Logger log = Logger.getLogger(UserBankServiceImpl.class.getName());
+	
 	@Override
 	public UserBank createBankUser(@Valid UserBankRequest request) throws Exception {
 		List<UserBank> userBankList = userBankRepo.findByUserName(request.getUserName());
@@ -45,5 +50,52 @@ public class UserBankServiceImpl implements UserBankService {
 	@Override
 	public UserBank userBankLogin() {
 		return null;
+	}
+
+	@Override
+	public ECollectionVO saveECollectionInfo(String userName, String password, ECollectionVO eCollections) {
+		
+		// TODO : move all to seprate methods 
+		
+		if(!validateCredentials(userName, password)) {
+			
+			List<ECollection> collections = new ArrayList<>();
+			collections.add(new ECollection(null, null, null, null, null, null,null, new Date(), null, "Invalid credentials, Invalida username or password", ECollection.STATUS_REJECT));
+			
+			return new ECollectionVO(collections);
+		}
+		
+		if(eCollections == null || (eCollections.geteCollections() == null)) { 
+			List<ECollection> collections = new ArrayList<>();
+			collections.add(new ECollection(null, null, null, null, null, null,null, new Date(), null, "Invalid data ,No Data found", ECollection.STATUS_REJECT));
+			
+			return new ECollectionVO(collections);
+		}
+		
+		List<ECollection> eCollectionResponse =  eCollections.geteCollections().stream().map(e -> { 
+			
+			log.info(e.toString()+System.lineSeparator()); // print data 
+			
+			return new ECollection(e.getClientCode(), e.getVirtulaAccNo(), e.getTrxAmount(), e.getUrtNo(), e.getSenderIFSCCode(), null,
+					"NULL", new Date(), null, null, ECollection.STATUS_ACCEPT);
+		}
+		).collect(Collectors.toList());
+	
+		return new ECollectionVO(eCollectionResponse);
+	}
+	
+	private boolean validateCredentials(String userName, String password){
+		
+		boolean response = false;
+		List<UserBank> userBank = userBankRepo.findByUserName(userName);
+		
+		if(userBank == null || userBank.isEmpty()) {
+			log.warning("No details found with username:"+userName+" timestamp:"+new Date());
+		} else {
+			if(userBank.get(0).getPassword().equalsIgnoreCase(password))  // TODO : getting the 1st result only , will the user have many to one relation here ?
+				response = true;
+		}
+		
+		return response;
 	}
 }
