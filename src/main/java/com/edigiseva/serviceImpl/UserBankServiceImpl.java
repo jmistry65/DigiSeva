@@ -64,7 +64,7 @@ public class UserBankServiceImpl implements UserBankService {
 		// TODO : move all to seprate methods 
 		String virtualAcNo = eCollections.geteCollections().get(0).getVirtulaAccNo();
 		virtualAcNo = virtualAcNo.replaceAll("LINK", ""); 
-		if(!validateCredentials(userName, password) &&  validateVirtualAccountNo(virtualAcNo)) {
+		if(!validateCredentials(userName, password)) {
 			
 			List<ECollection> collections = new ArrayList<>();
 			collections.add(new ECollection(null, null, null, null, null, null,null, new Date(), null, "Invalid credentials, Invalida username or password", ECollection.STATUS_REJECT));
@@ -72,6 +72,11 @@ public class UserBankServiceImpl implements UserBankService {
 			return new ECollectionVO(collections);
 		}
 		
+		if(!validateVirtualAccountNo(virtualAcNo)) {
+			List<ECollection> collections = new ArrayList<>();
+			collections.add(new ECollection(null, null, null, null, null, null,null, new Date(), null, "Invalid virtual account no", ECollection.STATUS_REJECT));
+			return new ECollectionVO(collections);
+		}
 		if(eCollections == null || (eCollections.geteCollections() == null)) { 
 			List<ECollection> collections = new ArrayList<>();
 			collections.add(new ECollection(null, null, null, null, null, null,null, new Date(), null, "Invalid data ,No Data found", ECollection.STATUS_REJECT));
