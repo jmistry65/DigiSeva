@@ -5,6 +5,7 @@ import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -17,7 +18,9 @@ import com.edigiseva.message.request.ECollectionVO;
 import com.edigiseva.message.request.UserBankRequest;
 import com.edigiseva.model.ECollection;
 import com.edigiseva.model.UserBank;
+import com.edigiseva.model.Users;
 import com.edigiseva.repository.UserBankRepository;
+import com.edigiseva.repository.UserRepository;
 import com.edigiseva.securedata.AsymmetricCryptography;
 import com.edigiseva.service.UserBankService;
 
@@ -26,6 +29,9 @@ public class UserBankServiceImpl implements UserBankService {
 
 	@Autowired
 	private UserBankRepository userBankRepo;
+	
+	@Autowired
+	private UserRepository userRepo;
 
 	private static final Logger log = Logger.getLogger(UserBankServiceImpl.class.getName());
 	
@@ -56,8 +62,9 @@ public class UserBankServiceImpl implements UserBankService {
 	public ECollectionVO saveECollectionInfo(String userName, String password, ECollectionVO eCollections) {
 		
 		// TODO : move all to seprate methods 
-		
-		if(!validateCredentials(userName, password)) {
+		String virtualAcNo = eCollections.geteCollections().get(0).getVirtulaAccNo();
+		virtualAcNo = virtualAcNo.replaceAll("LINK", ""); 
+		if(!validateCredentials(userName, password) &&  validateVirtualAccountNo(virtualAcNo)) {
 			
 			List<ECollection> collections = new ArrayList<>();
 			collections.add(new ECollection(null, null, null, null, null, null,null, new Date(), null, "Invalid credentials, Invalida username or password", ECollection.STATUS_REJECT));
@@ -96,6 +103,15 @@ public class UserBankServiceImpl implements UserBankService {
 				response = true;
 		}
 		
+		return response;
+	}
+	
+	private boolean validateVirtualAccountNo(String virtualAcNo) {
+		boolean response = false;
+		Optional<Users> user = userRepo.findByMobileNo(Long.parseLong(virtualAcNo));
+		if(user.isPresent() && user.get().getMobileNo() == Long.parseLong(virtualAcNo)) {
+			response = true;
+		}
 		return response;
 	}
 }
