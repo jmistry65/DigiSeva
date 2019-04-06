@@ -15,6 +15,9 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import org.json.JSONObject;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import com.edigiseva.message.request.DigiSevaResponseEntity;
 import com.edigiseva.utils.Utilities;
@@ -60,6 +64,15 @@ public class InstaPayAPIs {
 	        json.put("creditAccountNumber", creditAccountNumber);
 	        json.put("transactionAmount", transactionAmount);
 	        json.put("IFSCCode", IFSCCode);
-	        return Utilities.createResponse(false, "", HttpStatus.OK, json);
+	        
+	        RestTemplate restTemplate = new RestTemplate();
+			String URL = "https://apigwuat.icicibank.com:8443/api/Corporate/CAB/v1/InstaIMPSProcess/Test";
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("Content-Type", "application/json");
+			headers.set("Username", "TESTIMPS");
+			headers.set("Password", "PohqVJ3wfmDBlVx0bPs78lx0StUjCiXxWZOvxbYH2uBXxkVpVyjBZjp7IgjEnwlNX+U4PyiAtctTr8KLVqjK8BTuFOkGtcidu5dpONs3QSM75vLnrQEfOjgvi0uq5U5Lvlin9vfFXf3RPmzAvKDVHGMWfGtSTxO+c3Jj2uJzFs8=");
+		
+			String result = restTemplate.postForObject(URL, json, String.class);
+	        return Utilities.createResponse(false, "", HttpStatus.OK, result);
 	}
 }
