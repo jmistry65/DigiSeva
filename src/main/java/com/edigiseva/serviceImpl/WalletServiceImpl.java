@@ -1,5 +1,6 @@
 package com.edigiseva.serviceImpl;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -38,6 +39,17 @@ public class WalletServiceImpl implements WalletService {
 			walletList = walletRepo.findByUser(userData.get());
 		}
 		return walletList;
+	}
+
+
+	@Override
+	public boolean addMoneyTowallet(BigDecimal amount, Long userID) {
+		Optional<Users> userData = userRepo.findById(userID);
+		boolean isAdded = false;
+		if (userData.isPresent()) {
+			isAdded = walletRepo.addMoneyTowallet(amount, userID);
+		}
+		return isAdded;
 	}
 
 }
