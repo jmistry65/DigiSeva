@@ -5,9 +5,9 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.NoSuchPaddingException;
 import javax.validation.Valid;
 
-import com.edigiseva.message.request.ECollectionVO;
 import com.edigiseva.message.request.UserBankRequest;
 import com.edigiseva.model.UserBank;
+import com.edigiseva.model.VirtualAccountNumberVerificationIN;
 
 public interface UserBankService {
 
@@ -15,5 +15,6 @@ public interface UserBankService {
 
 	UserBank userBankLogin();
 
-	ECollectionVO saveECollectionInfo(String userName, String password, ECollectionVO eCollections);
+	VirtualAccountNumberVerificationIN saveECollectionInfo(String userName, String password,
+			VirtualAccountNumberVerificationIN eCollections);
 }

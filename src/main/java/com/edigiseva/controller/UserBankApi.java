@@ -7,20 +7,18 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.edigiseva.message.request.ECollectionVO;
 import com.edigiseva.message.request.BankRequest;
 import com.edigiseva.message.request.DigiSevaResponseEntity;
 import com.edigiseva.model.Bank;
 import com.edigiseva.model.Users;
+import com.edigiseva.model.VirtualAccountNumberVerificationIN;
 import com.edigiseva.service.BankService;
 import com.edigiseva.service.UserBankService;
 import com.edigiseva.service.UserService;
@@ -54,8 +52,8 @@ public class UserBankApi {
 	}
 	
 	@PostMapping("/icicibankuat")
-	public ResponseEntity<?> saveECollectionInfo(@RequestParam(name="username",required=true) String userName , @RequestParam(name="password",required=true) String password ,
-											@RequestBody ECollectionVO eCollections){
+	public ResponseEntity<?> saveECollectionInfo(@RequestHeader(name="username",required=true) String userName , @RequestHeader(name="password",required=true) String password ,
+											@RequestBody VirtualAccountNumberVerificationIN eCollections){
 		
 		return new ResponseEntity<>(userBankServce.saveECollectionInfo(userName,password,eCollections),HttpStatus.OK); // TODO : Change HTTP Sstatus and model as well 
 	}

@@ -11,10 +11,10 @@ import com.edigiseva.model.Wallet;
 public interface WalletService {
 
 	
-	@Query("SELECT w FROM Wallet w WHERE w.isActive = :true and b.user.id:=userID")
+	@Query("SELECT w FROM Wallet w WHERE w.isActi1ve =:true and w.user.id=:userID")
 	public List<Wallet> findByUser(@Param("userID") Long userID);
 	
-	@Query("UPDATE Wallet set amount = :amount WHERE w.isActive = :true and b.user.id:=userID")
-	public boolean addMoneyTowallet(@Param("amount") BigDecimal amount, @Param("userID") Long userID);
+	
+	public boolean addMoneyTowallet(BigDecimal amount,Long userID);
 
 }

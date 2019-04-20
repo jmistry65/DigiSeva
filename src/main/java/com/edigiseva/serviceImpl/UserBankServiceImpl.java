@@ -2,23 +2,20 @@ package com.edigiseva.serviceImpl;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.edigiseva.message.request.ECollectionVO;
 import com.edigiseva.message.request.UserBankRequest;
-import com.edigiseva.model.ECollection;
 import com.edigiseva.model.UserBank;
 import com.edigiseva.model.Users;
+import com.edigiseva.model.VirtualAccountNumberVerificationIN;
 import com.edigiseva.repository.UserBankRepository;
 import com.edigiseva.repository.UserRepository;
 import com.edigiseva.securedata.AsymmetricCryptography;
@@ -59,41 +56,33 @@ public class UserBankServiceImpl implements UserBankService {
 	}
 
 	@Override
-	public ECollectionVO saveECollectionInfo(String userName, String password, ECollectionVO eCollections) {
+	public VirtualAccountNumberVerificationIN saveECollectionInfo(String userName, String password, VirtualAccountNumberVerificationIN eCollections) {
 		
 		// TODO : move all to seprate methods 
-		String virtualAcNo = eCollections.geteCollections().get(0).getVirtulaAccNo();
+		String virtualAcNo = eCollections.getVirtualAccountNumber();
 		virtualAcNo = virtualAcNo.replaceAll("LINK", ""); 
+		VirtualAccountNumberVerificationIN virtualAccountNumberVerificationIN = eCollections;
+		
+		if(eCollections.equals(null)) { 
+			eCollections.setRejectReason("Invalid data ,No Data found");
+			eCollections.setStatus(VirtualAccountNumberVerificationIN.STATUS_REJECT);
+			return eCollections;
+		}
 		if(!validateCredentials(userName, password)) {
-			
-			List<ECollection> collections = new ArrayList<>();
-			collections.add(new ECollection(null, null, null, null, null, null,null, new Date(), null, "Invalid credentials, Invalida username or password", ECollection.STATUS_REJECT));
-			
-			return new ECollectionVO(collections);
+			virtualAccountNumberVerificationIN.setRejectReason("Invalid credentials, Invalida username or password");
+			virtualAccountNumberVerificationIN.setStatus(VirtualAccountNumberVerificationIN.STATUS_REJECT);
+			return virtualAccountNumberVerificationIN;
 		}
 		
 		if(!validateVirtualAccountNo(virtualAcNo)) {
-			List<ECollection> collections = new ArrayList<>();
-			collections.add(new ECollection(null, null, null, null, null, null,null, new Date(), null, "Invalid virtual account no", ECollection.STATUS_REJECT));
-			return new ECollectionVO(collections);
-		}
-		if(eCollections == null || (eCollections.geteCollections() == null)) { 
-			List<ECollection> collections = new ArrayList<>();
-			collections.add(new ECollection(null, null, null, null, null, null,null, new Date(), null, "Invalid data ,No Data found", ECollection.STATUS_REJECT));
-			
-			return new ECollectionVO(collections);
+			virtualAccountNumberVerificationIN.setRejectReason("Invalid virtual account no");
+			virtualAccountNumberVerificationIN.setStatus(VirtualAccountNumberVerificationIN.STATUS_ACCEPT);
+			return virtualAccountNumberVerificationIN;
 		}
 		
-		List<ECollection> eCollectionResponse =  eCollections.geteCollections().stream().map(e -> { 
-			
-			log.info(e.toString()+System.lineSeparator()); // print data 
-			
-			return new ECollection(e.getClientCode(), e.getVirtulaAccNo(), e.getTrxAmount(), e.getUrtNo(), e.getSenderIFSCCode(), null,
-					"NULL", new Date(), null, null, ECollection.STATUS_ACCEPT);
-		}
-		).collect(Collectors.toList());
-	
-		return new ECollectionVO(eCollectionResponse);
+		virtualAccountNumberVerificationIN.setRejectReason(null);
+		virtualAccountNumberVerificationIN.setStatus(VirtualAccountNumberVerificationIN.STATUS_ACCEPT);
+		return virtualAccountNumberVerificationIN;
 	}
 	
 	private boolean validateCredentials(String userName, String password){

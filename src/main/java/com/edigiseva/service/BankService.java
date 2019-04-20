@@ -15,7 +15,7 @@ public interface BankService {
 
 	Bank setUserBank(@Valid BankRequest request, Users users);
 
-	@Query("SELECT b FROM Bank b WHERE b.isActive = :true and b.user.id:=user.id")
+	@Query("SELECT b FROM Bank b WHERE b.isActive = :true and b.user.id=: user.id")
 	public List<Bank> findByUser(@Param("user") Users user);
 
 }
