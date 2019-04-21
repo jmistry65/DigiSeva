@@ -40,7 +40,7 @@ public class OTPAPIs {
 	}
 
 	@PostMapping(value = "/validateOtp")
-	public ResponseEntity<DigiSevaResponseEntity> updatePassword(@RequestBody int request) {
+	public ResponseEntity<DigiSevaResponseEntity> updatePassword(@RequestBody String request) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		JSONObject reqObject = new JSONObject(request);
 		Long mobileNo = reqObject.getLong("mobileNo");

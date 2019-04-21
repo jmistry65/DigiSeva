@@ -63,13 +63,12 @@ public class UserServiceImpl implements UserService {
 		}
 		user.get().setPassword(newPassword);
 		userRepo.save(user.get());
-		return Utilities.createResponse(true, "Password updated successfully", HttpStatus.CONFLICT, "");
+		return Utilities.createResponse(true, "Password updated successfully", HttpStatus.OK, "");
 	}
 
 	@Override
 	public Optional<Users> findById(Long user_id) {
-		// TODO Auto-generated method stub
-		return null;
+		return userRepo.findById(user_id);
 	}
 
 	@Override
